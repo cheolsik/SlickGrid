@@ -37,19 +37,22 @@
     function handleSelectedRowsChanged(e, args) {
       var selectedRows = _grid.getSelectedRows();
       var lookup = {}, row, i;
+      var invalidatedRows = [];
       for (i = 0; i < selectedRows.length; i++) {
         row = selectedRows[i];
         lookup[row] = true;
         if (lookup[row] !== _selectedRowsLookup[row]) {
-          _grid.invalidateRow(row);
+          invalidatedRows.push(row);
           delete _selectedRowsLookup[row];
         }
       }
       for (i in _selectedRowsLookup) {
-        _grid.invalidateRow(i);
+        invalidatedRows.push(i);
       }
       _selectedRowsLookup = lookup;
-      _grid.render();
+      for(i = 0; i < invalidatedRows.length; i++){
+        _grid.updateCell(invalidatedRows[i], 0)
+      }
 
       if (selectedRows.length && selectedRows.length == _grid.getDataLength()) {
         _grid.updateColumnHeader(_options.columnId, "<input type='checkbox' checked='checked'>", _options.toolTip);
